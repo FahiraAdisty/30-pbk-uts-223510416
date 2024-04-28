@@ -118,6 +118,6 @@ input[type='checkbox'] {
 
 .selesai {
   text-decoration: line-through;
-  color: #888;
+  color: #ff00d9;
 }
 </style>
