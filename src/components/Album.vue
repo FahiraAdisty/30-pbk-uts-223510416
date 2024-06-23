@@ -15,7 +15,7 @@
       </div>
       <template v-else>
         <div v-if="photos.length > 0" class="album-grid">
-          <div v-for="(photo, index) in photos" :key="index" class="photo-item" @click="openPhoto(index)">
+          <div v-for="(photo, index) in photos" :key="index" class="photo-item" @click="openPhoto(photo.id)">
             <img :src="photo.thumbnailUrl" :alt="'Photo ' + index" class="photo-thumbnail">
           </div>
         </div>
@@ -30,34 +30,22 @@
     <div v-else>
       <p class="no-photos-message">Pilih pengguna untuk melihat album foto.</p>
     </div>
-
-    <!-- Photo Dialog -->
-    <q-dialog v-model="dialogVisible" persistent class="photo-dialog">
-      <q-card>
-        <q-card-section>
-          <img :src="selectedPhoto.url" alt="Full Size Photo" class="photo-fullsize">
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn color="primary" label="Tutup" @click="closePhoto" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
 <script>
 import { ref, watch } from 'vue'
 import { useUserStore } from '../stores/userStore'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'Album',
   setup() {
     const userStore = useUserStore()
     const photos = ref([])
-    const selectedPhoto = ref(null)
-    const dialogVisible = ref(false)
     const selectedUserId = ref(null)
     const photosLoading = ref(false)
+    const router = useRouter()
 
     const fetchPhotos = async () => {
       if (selectedUserId.value !== null) {
@@ -73,37 +61,26 @@ export default {
       }
     }
 
-    // Watch for changes in selectedUserId and fetch photos accordingly
     watch(selectedUserId, () => {
       if (selectedUserId.value !== null) {
         fetchPhotos()
       } else {
-        photos.value = [] // Clear photos if no user is selected
+        photos.value = [] 
       }
     })
 
-    // Prefetch users data
     userStore.fetchUsers()
 
-    const openPhoto = (index) => {
-      selectedPhoto.value = photos.value[index]
-      dialogVisible.value = true
-    }
-
-    const closePhoto = () => {
-      dialogVisible.value = false
-      selectedPhoto.value = null
+    const openPhoto = (photoId) => {
+      router.push(`/albums/${photoId}`)
     }
 
     return {
       users: userStore.users,
       photos,
-      selectedPhoto,
-      dialogVisible,
       selectedUserId,
       fetchPhotos,
       openPhoto,
-      closePhoto,
       photosLoading
     }
   }
@@ -161,35 +138,6 @@ export default {
 
 .photo-thumbnail:hover {
   transform: scale(1.05);
-}
-
-.photo-dialog {
-  max-width: 90vw;
-}
-
-.photo-fullsize {
-  max-width: 80%;
-  height: auto;
-  border-radius: 5px;
-}
-
-.q-dialog {
-  max-width: 100vw !important;
-}
-
-.q-card {
-  position: relative;
-  width: auto;
-  max-width: 50%;
-  margin: 20px auto;
-}
-
-.q-card-actions {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 0;
-  padding: 8px;
 }
 
 .loading-message,

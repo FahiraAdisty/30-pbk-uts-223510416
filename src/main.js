@@ -8,5 +8,5 @@ import 'quasar/src/css/index.sass'
 createApp(App)
   .use(router)
   .use(pinia)
-  .use(Quasar, { plugins: {} })  // Quasar plugin options
+  .use(Quasar, { plugins: {} })  
   .mount('#app')
